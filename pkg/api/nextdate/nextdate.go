@@ -55,6 +55,9 @@ func NextDate(now time.Time, dstart, repeat string) (string, error) {
 		return date.Format(DF), nil
 
 	case "w":
+		if len(parts) < 2 || strings.TrimSpace(parts[1]) == "" {
+			return "", fmt.Errorf("w rule: missing weekday list")
+		}
 		var weekDays [7]bool
 		for _, day := range strings.Split(parts[1], ",") {
 			nday, err := strconv.Atoi(day)

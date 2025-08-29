@@ -2,6 +2,7 @@ package main
 
 import (
 	api "finalProjectToDoList/pkg/api/nextdate"
+	"finalProjectToDoList/pkg/api/task"
 	"finalProjectToDoList/pkg/db"
 	"log"
 	"net/http"
@@ -30,6 +31,7 @@ func main() {
 	http.Handle("/", http.FileServer(http.Dir(webDir)))
 
 	api.Init()
+	task.Init()
 
 	log.Printf("Listening on :%s", port)
 	if err := http.ListenAndServe(":"+port, nil); err != nil {
