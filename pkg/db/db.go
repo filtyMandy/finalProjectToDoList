@@ -6,6 +6,9 @@ import (
 	"log"
 	_ "modernc.org/sqlite"
 	"os"
+	"strings"
+	"time"
+	"unicode"
 )
 
 var DB *sql.DB //Connecting DB
@@ -16,6 +19,73 @@ type Task struct {
 	Title   string `json:"title"`
 	Comment string `json:"comment"`
 	Repeat  string `json:"repeat"`
+}
+
+func ValidateTask(t *Task) error {
+	// is date
+	if len(t.Date) != 8 || !onlyDigits(t.Date) {
+		return fmt.Errorf("invalid date: %s", t.Date)
+	}
+
+	//  date exist
+	_, err := time.Parse("20060102", t.Date)
+	if err != nil {
+		return fmt.Errorf("invalid date: %s", t.Date)
+	}
+	// title empty
+	if strings.TrimSpace(t.Title) == "" {
+		return fmt.Errorf("invalid title: %s", t.Title)
+	}
+
+	if !validateRepeat(t.Repeat) {
+		return fmt.Errorf("invalid repeat: %s", t.Repeat)
+	}
+
+	return nil
+}
+
+func validateRepeat(r string) bool {
+	return r == "" || strings.HasPrefix(r, "d ") || strings.HasPrefix(r, "w ")
+}
+
+func onlyDigits(s string) bool {
+	for _, r := range s {
+		if !unicode.IsDigit(r) {
+			return false
+		}
+	}
+	return true
+}
+
+func UpdateTask(t *Task) error {
+	query := `UPDATE scheduler SET date=?, title=?, comment=?, repeat=? WHERE id=?`
+	res, err := DB.Exec(query, t.Date, t.Title, t.Comment, t.Repeat, t.ID)
+	if err != nil {
+		return err
+	}
+	cnt, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if cnt == 0 {
+		return fmt.Errorf("task %s not found", t.ID)
+	}
+	return nil
+}
+
+func GetTask(id string) (*Task, error) {
+	row := DB.QueryRow(`SELECT id, date, title, comment, repeat FROM scheduler WHERE id = ?`, id)
+	t := Task{}
+	var idDB int64
+	err := row.Scan(&idDB, &t.Date, &t.Title, &t.Comment, &t.Repeat)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, fmt.Errorf("task not found")
+		}
+		return nil, fmt.Errorf("error getting task: %v", err)
+	}
+	t.ID = fmt.Sprintf("%d", idDB)
+	return &t, nil
 }
 
 // show tasks by search
