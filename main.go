@@ -3,6 +3,7 @@ package main
 import (
 	api "finalProjectToDoList/pkg/api/nextdate"
 	"finalProjectToDoList/pkg/api/task"
+	"finalProjectToDoList/pkg/api/task/done"
 	"finalProjectToDoList/pkg/api/tasks"
 	"finalProjectToDoList/pkg/db"
 	"log"
@@ -34,6 +35,7 @@ func main() {
 	api.Init()
 	task.Init()
 	tasks.Init()
+	done.Init()
 
 	log.Printf("Listening on :%s", port)
 	if err := http.ListenAndServe(":"+port, nil); err != nil {

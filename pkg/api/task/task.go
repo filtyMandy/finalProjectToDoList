@@ -6,6 +6,20 @@ import (
 	"net/http"
 )
 
+func deleteTaskHandler(w http.ResponseWriter, r *http.Request) {
+	id := r.URL.Query().Get("id")
+	if id == "" {
+		WriteJSON(w, map[string]string{"error": "ID not specified"})
+		return
+	}
+	err := db.DeleteTask(id)
+	if err != nil {
+		WriteJSON(w, map[string]string{"error": err.Error()})
+		return
+	}
+	WriteJSON(w, map[string]interface{}{})
+}
+
 func getTaskHandler(w http.ResponseWriter, r *http.Request) {
 	id := r.URL.Query().Get("id")
 	if id == "" {
@@ -45,12 +59,13 @@ func putTaskHandler(w http.ResponseWriter, r *http.Request) {
 func taskHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodPost:
-
 		addTaskHandler(w, r)
 	case http.MethodPut:
 		putTaskHandler(w, r)
 	case http.MethodGet:
 		getTaskHandler(w, r)
+	case http.MethodDelete:
+		deleteTaskHandler(w, r)
 	default:
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
 	}

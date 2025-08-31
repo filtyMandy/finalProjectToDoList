@@ -2,6 +2,7 @@ package db
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"log"
 	_ "modernc.org/sqlite"
@@ -19,6 +20,26 @@ type Task struct {
 	Title   string `json:"title"`
 	Comment string `json:"comment"`
 	Repeat  string `json:"repeat"`
+}
+
+func DeleteTask(id string) error {
+	res, err := DB.Exec("DELETE FROM scheduler WHERE id=?", id)
+	if err != nil {
+		return err
+	}
+	n, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if n == 0 {
+		return errors.New("task does not exist")
+	}
+	return nil
+}
+
+func UpdateDate(id string, date string) error {
+	_, err := DB.Exec("UPDATE scheduler SET date=? WHERE id=?", date, id)
+	return err
 }
 
 func ValidateTask(t *Task) error {
