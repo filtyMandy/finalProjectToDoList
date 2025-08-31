@@ -10,8 +10,6 @@ import (
 	"time"
 )
 
-const DF = "20060102"
-
 func addTaskHandler(w http.ResponseWriter, r *http.Request) {
 	var t db.Task
 
