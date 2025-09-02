@@ -15,24 +15,24 @@ func addTaskHandler(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(&t)
 	if err != nil {
-		WriteJSON(w, map[string]string{"error": "Error JSON: " + err.Error()})
+		WriteJSONError(w, "Error JSON: ")
 		return
 	}
 	t.Title = strings.TrimSpace(t.Title)
 	if t.Title == "" {
-		WriteJSON(w, map[string]string{"error": "Title is empty"})
+		WriteJSONError(w, "Title is empty")
 		return
 	}
 
 	err = checkDate(&t)
 	if err != nil {
-		WriteJSON(w, map[string]string{"error": "Date format is wrong"})
+		WriteJSONError(w, "Date format is wrong")
 		return
 	}
 
 	id, err := db.AddTask(t)
 	if err != nil {
-		WriteJSON(w, map[string]string{"error": err.Error()})
+		WriteJSONError(w, "error AddTask")
 		return
 	}
 

@@ -12,14 +12,14 @@ import (
 func doneTaskHandler(w http.ResponseWriter, r *http.Request) {
 	id := r.URL.Query().Get("id")
 	if id == "" {
-		task.WriteJSON(w, map[string]string{"error": "ID not specified"})
+		task.WriteJSONError(w, "ID not specified")
 		return
 	}
 
 	// getting task
 	t, err := db.GetTask(id)
 	if err != nil {
-		task.WriteJSON(w, map[string]string{"error": err.Error()})
+		task.WriteJSONError(w, "error GetTask")
 		return
 	}
 
@@ -27,7 +27,7 @@ func doneTaskHandler(w http.ResponseWriter, r *http.Request) {
 		// one time - delete
 		err = db.DeleteTask(id)
 		if err != nil {
-			task.WriteJSON(w, map[string]string{"error": err.Error()})
+			task.WriteJSONError(w, "error GetTask")
 			return
 		}
 		task.WriteJSON(w, map[string]interface{}{})
@@ -37,12 +37,12 @@ func doneTaskHandler(w http.ResponseWriter, r *http.Request) {
 	// counting next date
 	next, err := api.NextDate(time.Now(), t.Date, t.Repeat)
 	if err != nil {
-		task.WriteJSON(w, map[string]string{"error": err.Error()})
+		task.WriteJSONError(w, "error NextDate")
 		return
 	}
 	err = db.UpdateDate(id, next)
 	if err != nil {
-		task.WriteJSON(w, map[string]string{"error": err.Error()})
+		task.WriteJSONError(w, "error UpdateDate")
 		return
 	}
 	task.WriteJSON(w, map[string]interface{}{})

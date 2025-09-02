@@ -3,18 +3,21 @@ package task
 import (
 	"encoding/json"
 	"finalProjectToDoList/pkg/db"
+	"log"
 	"net/http"
 )
 
 func deleteTaskHandler(w http.ResponseWriter, r *http.Request) {
 	id := r.URL.Query().Get("id")
 	if id == "" {
-		WriteJSON(w, map[string]string{"error": "ID not specified"})
+		log.Printf("[DeleteTask] id not specified")
+		WriteJSONError(w, "ID not specified")
 		return
 	}
 	err := db.DeleteTask(id)
 	if err != nil {
-		WriteJSON(w, map[string]string{"error": err.Error()})
+		log.Printf("[DeleteTask] failed to delete id %s: %v", id, err)
+		WriteJSONError(w, "error DeleteTask")
 		return
 	}
 	WriteJSON(w, map[string]interface{}{})
@@ -23,12 +26,12 @@ func deleteTaskHandler(w http.ResponseWriter, r *http.Request) {
 func getTaskHandler(w http.ResponseWriter, r *http.Request) {
 	id := r.URL.Query().Get("id")
 	if id == "" {
-		WriteJSON(w, map[string]string{"error": "ID not specified"})
+		WriteJSONError(w, "ID not specified")
 		return
 	}
 	task, err := db.GetTask(id)
 	if err != nil {
-		WriteJSON(w, map[string]string{"error": err.Error()})
+		WriteJSONError(w, "error GetTask")
 		return
 	}
 	WriteJSON(w, task)
@@ -38,19 +41,19 @@ func putTaskHandler(w http.ResponseWriter, r *http.Request) {
 	var t db.Task
 	err := json.NewDecoder(r.Body).Decode(&t)
 	if err != nil {
-		WriteJSON(w, map[string]string{"error": "Invalid JSON"})
+		WriteJSONError(w, "Invalid JSON")
 		return
 	}
 
 	err = db.ValidateTask(&t)
 	if err != nil {
-		WriteJSON(w, map[string]string{"error": err.Error()})
+		WriteJSONError(w, "error ValidateTask")
 		return
 	}
 
 	err = db.UpdateTask(&t)
 	if err != nil {
-		WriteJSON(w, map[string]string{"error": err.Error()})
+		WriteJSONError(w, "error UpdateTask")
 		return
 	}
 	WriteJSON(w, map[string]interface{}{})

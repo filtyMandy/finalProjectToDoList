@@ -103,7 +103,7 @@ func GetTask(id string) (*Task, error) {
 		if err == sql.ErrNoRows {
 			return nil, fmt.Errorf("task not found")
 		}
-		return nil, fmt.Errorf("error getting task: %v", err)
+		return nil, fmt.Errorf("error getting task: %w", err)
 	}
 	t.ID = fmt.Sprintf("%d", idDB)
 	return &t, nil
@@ -112,10 +112,11 @@ func GetTask(id string) (*Task, error) {
 // show tasks by search
 
 func FindTasksBySubstring(substring string, limit int) ([]*Task, error) {
+	substringReq := "%" + substring + "%"
 	rows, err := DB.Query(`SELECT * FROM scheduler WHERE title LIKE ? OR comment LIKE ? ORDER BY date LIMIT ?`,
-		substring, substring, limit)
+		substringReq, substringReq, limit)
 	if err != nil {
-		return nil, fmt.Errorf("FindTasksBySubstring: %s", err)
+		return nil, fmt.Errorf("FindTasksBySubstring: %w", err)
 	}
 	defer rows.Close()
 	var tasks []*Task
@@ -124,7 +125,7 @@ func FindTasksBySubstring(substring string, limit int) ([]*Task, error) {
 		var id int64
 		err := rows.Scan(&id, &t.Date, &t.Title, &t.Comment, &t.Repeat)
 		if err != nil {
-			return nil, fmt.Errorf("FindTasksBySubstring(Scan): %s", err)
+			return nil, fmt.Errorf("FindTasksBySubstring(Scan): %w", err)
 		}
 		t.ID = fmt.Sprintf("%d", id)
 		tasks = append(tasks, t)
@@ -138,7 +139,7 @@ func FindTasksBySubstring(substring string, limit int) ([]*Task, error) {
 func FindTaskByDate(date string, limit int) ([]*Task, error) {
 	rows, err := DB.Query(`SELECT * FROM scheduler WHERE date = ? LIMIT ?`, date, limit)
 	if err != nil {
-		return nil, fmt.Errorf("FindTaskByDate: %s", err)
+		return nil, fmt.Errorf("FindTaskByDate: %w", err)
 	}
 	defer rows.Close()
 	var tasks []*Task
@@ -147,7 +148,7 @@ func FindTaskByDate(date string, limit int) ([]*Task, error) {
 		var id int64
 		err := rows.Scan(&id, &t.Date, &t.Title, &t.Comment, &t.Repeat)
 		if err != nil {
-			return nil, fmt.Errorf("FindTaskByDate(Scan): %s", err)
+			return nil, fmt.Errorf("FindTaskByDate(Scan): %w", err)
 		}
 		t.ID = fmt.Sprintf("%d", id)
 		tasks = append(tasks, t)
@@ -164,7 +165,7 @@ func Tasks(limit int) ([]*Task, error) {
 	rows, err := DB.Query(`SELECT id, date, title, comment, repeat FROM scheduler
 		ORDER BY date ASC LIMIT ?`, limit)
 	if err != nil {
-		return nil, fmt.Errorf("DB error: %v", err)
+		return nil, fmt.Errorf("DB error: %w", err)
 	}
 	defer rows.Close()
 	var tasks []*Task
@@ -173,7 +174,7 @@ func Tasks(limit int) ([]*Task, error) {
 		var id int64
 		err := rows.Scan(&id, &t.Date, &t.Title, &t.Comment, &t.Repeat)
 		if err != nil {
-			return nil, fmt.Errorf("Scan error: %v", err)
+			return nil, fmt.Errorf("Scan error: %w", err)
 		}
 		t.ID = fmt.Sprintf("%d", id)
 		tasks = append(tasks, t)

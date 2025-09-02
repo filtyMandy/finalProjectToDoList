@@ -16,7 +16,7 @@ func getLastDayOfMonth(t time.Time) int {
 func NextDate(now time.Time, dstart, repeat string) (string, error) {
 	date, err := time.Parse(DF, dstart)
 	if err != nil {
-		return "", fmt.Errorf("Error dayStart: %v", err)
+		return "", fmt.Errorf("Error dayStart: %w", err)
 	}
 	originalDate := date
 	repeat = strings.TrimSpace(repeat)
