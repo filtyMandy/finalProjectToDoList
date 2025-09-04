@@ -1,7 +1,7 @@
 package main
 
 import (
-	api "finalProjectToDoList/pkg/api/nextdate"
+	"finalProjectToDoList/pkg/api/signin"
 	"finalProjectToDoList/pkg/api/task"
 	"finalProjectToDoList/pkg/api/task/done"
 	"finalProjectToDoList/pkg/api/tasks"
@@ -32,10 +32,10 @@ func main() {
 
 	http.Handle("/", http.FileServer(http.Dir(webDir)))
 
-	api.Init()
-	task.Init()
-	tasks.Init()
-	done.Init()
+	http.HandleFunc("/api/signin", signin.SigninHandler)
+	http.HandleFunc("/api/task", signin.Auth(task.TaskHandler))
+	http.HandleFunc("/api/tasks", signin.Auth(tasks.GetTaskHandler))
+	http.HandleFunc("/api/task/done", signin.Auth(done.DoneTaskHandler))
 
 	log.Printf("Listening on :%s", port)
 	if err := http.ListenAndServe(":"+port, nil); err != nil {

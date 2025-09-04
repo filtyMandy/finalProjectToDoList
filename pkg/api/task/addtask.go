@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	api "finalProjectToDoList/pkg/api/nextdate"
 	"finalProjectToDoList/pkg/db"
+	"finalProjectToDoList/pkg/util.go"
 	"fmt"
 	"net/http"
 	"strings"
@@ -15,28 +16,28 @@ func addTaskHandler(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(&t)
 	if err != nil {
-		WriteJSONError(w, "Error JSON: ")
+		util_go.WriteJSONError(w, http.StatusBadRequest, "Error JSON")
 		return
 	}
 	t.Title = strings.TrimSpace(t.Title)
 	if t.Title == "" {
-		WriteJSONError(w, "Title is empty")
+		util_go.WriteJSONError(w, http.StatusBadRequest, "Title is empty")
 		return
 	}
 
 	err = checkDate(&t)
 	if err != nil {
-		WriteJSONError(w, "Date format is wrong")
+		util_go.WriteJSONError(w, http.StatusBadRequest, "Date format is wrong")
 		return
 	}
 
 	id, err := db.AddTask(t)
 	if err != nil {
-		WriteJSONError(w, "error AddTask")
+		util_go.WriteJSONError(w, http.StatusBadRequest, "error AddTask")
 		return
 	}
 
-	WriteJSON(w, map[string]string{"id": fmt.Sprintf("%d", id)})
+	util_go.WriteJSON(w, map[string]string{"id": fmt.Sprintf("%d", id)})
 }
 
 func checkDate(task *db.Task) error {

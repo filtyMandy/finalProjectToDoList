@@ -1,4 +1,4 @@
-package task
+package util_go
 
 import (
 	"encoding/json"
@@ -14,12 +14,12 @@ func WriteJSON(w http.ResponseWriter, data any) {
 	}
 }
 
-func WriteJSONError(w http.ResponseWriter, msg string) {
+func WriteJSONError(w http.ResponseWriter, code int, msg string) {
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusInternalServerError)
+	w.WriteHeader(code)
 	err := json.NewEncoder(w).Encode(map[string]string{"error": msg})
 	if err != nil {
-		log.Printf("[WriteJSONError] marshal/send error: %v (original msg: %s)", err, msg)
+		log.Printf("[WriteJSONError] marshal/send error(code=%d): %v (original msg: %s)", code, err, msg)
 
 	}
 }

@@ -2,7 +2,9 @@ package task
 
 import (
 	"encoding/json"
+	"finalProjectToDoList/pkg/api/signin"
 	"finalProjectToDoList/pkg/db"
+	"finalProjectToDoList/pkg/util.go"
 	"log"
 	"net/http"
 )
@@ -11,55 +13,55 @@ func deleteTaskHandler(w http.ResponseWriter, r *http.Request) {
 	id := r.URL.Query().Get("id")
 	if id == "" {
 		log.Printf("[DeleteTask] id not specified")
-		WriteJSONError(w, "ID not specified")
+		util_go.WriteJSONError(w, http.StatusBadRequest, "ID not specified")
 		return
 	}
 	err := db.DeleteTask(id)
 	if err != nil {
 		log.Printf("[DeleteTask] failed to delete id %s: %v", id, err)
-		WriteJSONError(w, "error DeleteTask")
+		util_go.WriteJSONError(w, http.StatusBadRequest, "error DeleteTask")
 		return
 	}
-	WriteJSON(w, map[string]interface{}{})
+	util_go.WriteJSON(w, map[string]interface{}{})
 }
 
 func getTaskHandler(w http.ResponseWriter, r *http.Request) {
 	id := r.URL.Query().Get("id")
 	if id == "" {
-		WriteJSONError(w, "ID not specified")
+		util_go.WriteJSONError(w, http.StatusBadRequest, "ID not specified")
 		return
 	}
 	task, err := db.GetTask(id)
 	if err != nil {
-		WriteJSONError(w, "error GetTask")
+		util_go.WriteJSONError(w, http.StatusBadRequest, "error GetTask")
 		return
 	}
-	WriteJSON(w, task)
+	util_go.WriteJSON(w, task)
 }
 
 func putTaskHandler(w http.ResponseWriter, r *http.Request) {
 	var t db.Task
 	err := json.NewDecoder(r.Body).Decode(&t)
 	if err != nil {
-		WriteJSONError(w, "Invalid JSON")
+		util_go.WriteJSONError(w, http.StatusBadRequest, "Invalid JSON")
 		return
 	}
 
 	err = db.ValidateTask(&t)
 	if err != nil {
-		WriteJSONError(w, "error ValidateTask")
+		util_go.WriteJSONError(w, http.StatusBadRequest, "error ValidateTask")
 		return
 	}
 
 	err = db.UpdateTask(&t)
 	if err != nil {
-		WriteJSONError(w, "error UpdateTask")
+		util_go.WriteJSONError(w, http.StatusBadRequest, "error UpdateTask")
 		return
 	}
-	WriteJSON(w, map[string]interface{}{})
+	util_go.WriteJSON(w, map[string]interface{}{})
 }
 
-func taskHandler(w http.ResponseWriter, r *http.Request) {
+func TaskHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodPost:
 		addTaskHandler(w, r)
@@ -75,5 +77,5 @@ func taskHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func Init() {
-	http.HandleFunc("/api/task", taskHandler)
+	http.HandleFunc("/api/task", signin.Auth(TaskHandler))
 }
