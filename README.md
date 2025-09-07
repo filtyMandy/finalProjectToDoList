@@ -10,6 +10,7 @@
 При нахождении файла TODO_DBFILE в окружении в основной директории откроит альтернативную базу данных.
 В функции NextDate реализованны методы для назначения дней недели и дней в месяце.
 Добавлена авторизация по паролю из файла "TODO_PASSWORD" в основной директории.
+Добавлен DOCKERFILE.
 
 Тесты выполняются без ошибок при конфигурации settings.go:
 var Port = 7540
@@ -17,3 +18,10 @@ var DBFile = "../scheduler.db"
 var FullNextDate = true
 var Search = true
 var Token = ``
+
+Параметры запуска контейнера:
+docker run -d \
+-p 7540:7540 \
+-v "$(pwd)/scheduler.db":/root/scheduler.db \
+-e TODO_PASSWORD=СуперСекретныйПароль \
+my-todo-app
