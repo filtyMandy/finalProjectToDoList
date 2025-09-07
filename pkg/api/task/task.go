@@ -2,7 +2,6 @@ package task
 
 import (
 	"encoding/json"
-	"finalProjectToDoList/pkg/api/signin"
 	"finalProjectToDoList/pkg/db"
 	"finalProjectToDoList/pkg/util.go"
 	"log"
@@ -74,8 +73,4 @@ func TaskHandler(w http.ResponseWriter, r *http.Request) {
 	default:
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
 	}
-}
-
-func Init() {
-	http.HandleFunc("/api/task", signin.Auth(TaskHandler))
 }

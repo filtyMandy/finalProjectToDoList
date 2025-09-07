@@ -5,11 +5,7 @@ import (
 	"time"
 )
 
-func Init() {
-	http.HandleFunc("/api/nextdate", nextDateHandler)
-}
-
-func nextDateHandler(w http.ResponseWriter, r *http.Request) {
+func NextDateHandler(w http.ResponseWriter, r *http.Request) {
 	date := r.FormValue("date")
 	repeat := r.FormValue("repeat")
 	nowStr := r.FormValue("now")

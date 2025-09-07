@@ -1,6 +1,7 @@
 package main
 
 import (
+	api "finalProjectToDoList/pkg/api/nextdate"
 	"finalProjectToDoList/pkg/api/signin"
 	"finalProjectToDoList/pkg/api/task"
 	"finalProjectToDoList/pkg/api/task/done"
@@ -33,6 +34,7 @@ func main() {
 	http.Handle("/", http.FileServer(http.Dir(webDir)))
 
 	http.HandleFunc("/api/signin", signin.SigninHandler)
+	http.HandleFunc("/api/nextdate", signin.Auth(api.NextDateHandler))
 	http.HandleFunc("/api/task", signin.Auth(task.TaskHandler))
 	http.HandleFunc("/api/tasks", signin.Auth(tasks.GetTaskHandler))
 	http.HandleFunc("/api/task/done", signin.Auth(done.DoneTaskHandler))
